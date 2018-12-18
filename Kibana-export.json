@@ -1,0 +1,105 @@
+[
+  {
+    "_id": "04e90690-02d9-11e9-98e5-6b0645b756ca",
+    "_type": "dashboard",
+    "_source": {
+      "title": "Punctualiteit",
+      "hits": 0,
+      "description": "",
+      "panelsJSON": "[{\"embeddableConfig\":{},\"gridData\":{\"h\":15,\"i\":\"1\",\"w\":24,\"x\":0,\"y\":0},\"id\":\"029559f0-02d6-11e9-98e5-6b0645b756ca\",\"panelIndex\":\"1\",\"type\":\"visualization\",\"version\":\"6.3.0\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":15,\"i\":\"2\",\"w\":24,\"x\":24,\"y\":0},\"id\":\"2ca2e5b0-02da-11e9-98e5-6b0645b756ca\",\"panelIndex\":\"2\",\"type\":\"visualization\",\"version\":\"6.3.0\"}]",
+      "optionsJSON": "{\"darkTheme\":false,\"hidePanelTitles\":false,\"useMargins\":true}",
+      "version": 1,
+      "timeRestore": false,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"query\":{\"language\":\"lucene\",\"query\":\"\"},\"filter\":[],\"highlightAll\":true,\"version\":true}"
+      }
+    },
+    "_meta": {
+      "savedObjectVersion": 2
+    }
+  },
+  {
+    "_id": "4ee51be0-02d8-11e9-98e5-6b0645b756ca",
+    "_type": "search",
+    "_source": {
+      "title": "Flinke Voorlopers",
+      "description": "",
+      "hits": 0,
+      "columns": [
+        "punctuality",
+        "lineplanningnumber",
+        "type"
+      ],
+      "sort": [
+        "timestamp",
+        "desc"
+      ],
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"65a20f80-02d5-11e9-98e5-6b0645b756ca\",\"highlightAll\":true,\"version\":true,\"query\":{\"language\":\"lucene\",\"query\":\"\"},\"filter\":[{\"meta\":{\"index\":\"65a20f80-02d5-11e9-98e5-6b0645b756ca\",\"negate\":true,\"disabled\":false,\"alias\":null,\"type\":\"range\",\"key\":\"punctuality\",\"value\":\"-10,000 to 1,000\",\"params\":{\"gte\":-10000,\"lt\":1000}},\"range\":{\"punctuality\":{\"gte\":-10000,\"lt\":1000}},\"$state\":{\"store\":\"appState\"}},{\"meta\":{\"index\":\"65a20f80-02d5-11e9-98e5-6b0645b756ca\",\"negate\":false,\"disabled\":false,\"alias\":null,\"type\":\"exists\",\"key\":\"punctuality\",\"value\":\"exists\"},\"exists\":{\"field\":\"punctuality\"},\"$state\":{\"store\":\"appState\"}}]}"
+      }
+    },
+    "_meta": {
+      "savedObjectVersion": 2
+    }
+  },
+  {
+    "_id": "63889e00-02d8-11e9-98e5-6b0645b756ca",
+    "_type": "search",
+    "_source": {
+      "title": "Flinke Achterlopers",
+      "description": "",
+      "hits": 0,
+      "columns": [
+        "punctuality",
+        "lineplanningnumber",
+        "type"
+      ],
+      "sort": [
+        "timestamp",
+        "desc"
+      ],
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"65a20f80-02d5-11e9-98e5-6b0645b756ca\",\"highlightAll\":true,\"version\":true,\"query\":{\"language\":\"lucene\",\"query\":\"\"},\"filter\":[{\"meta\":{\"index\":\"65a20f80-02d5-11e9-98e5-6b0645b756ca\",\"negate\":false,\"disabled\":false,\"alias\":null,\"type\":\"exists\",\"key\":\"punctuality\",\"value\":\"exists\"},\"exists\":{\"field\":\"punctuality\"},\"$state\":{\"store\":\"appState\"}},{\"meta\":{\"index\":\"65a20f80-02d5-11e9-98e5-6b0645b756ca\",\"negate\":true,\"disabled\":false,\"alias\":null,\"type\":\"range\",\"key\":\"punctuality\",\"value\":\"-1,000 to 10,000\",\"params\":{\"gte\":-1000,\"lt\":10000}},\"range\":{\"punctuality\":{\"gte\":-1000,\"lt\":10000}},\"$state\":{\"store\":\"appState\"}}]}"
+      }
+    },
+    "_meta": {
+      "savedObjectVersion": 2
+    }
+  },
+  {
+    "_id": "2ca2e5b0-02da-11e9-98e5-6b0645b756ca",
+    "_type": "visualization",
+    "_source": {
+      "title": "Meest vertraagde bussen",
+      "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{\"customLabel\":\"Avg Delay\",\"field\":\"punctuality\"},\"schema\":\"metric\",\"type\":\"avg\"},{\"enabled\":true,\"id\":\"2\",\"params\":{\"field\":\"lineplanningnumber.keyword\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"order\":\"desc\",\"orderBy\":\"1\",\"otherBucket\":true,\"otherBucketLabel\":\"Other\",\"size\":5},\"schema\":\"segment\",\"type\":\"terms\"},{\"enabled\":true,\"id\":\"3\",\"params\":{\"customLabel\":\"Max Delay\",\"field\":\"punctuality\"},\"schema\":\"metric\",\"type\":\"max\"},{\"enabled\":true,\"id\":\"4\",\"params\":{\"customLabel\":\"Min Delay\",\"field\":\"punctuality\"},\"schema\":\"metric\",\"type\":\"min\"}],\"params\":{\"addLegend\":true,\"addTimeMarker\":false,\"addTooltip\":true,\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"labels\":{\"show\":true,\"truncate\":100},\"position\":\"bottom\",\"scale\":{\"type\":\"linear\"},\"show\":true,\"style\":{},\"title\":{},\"type\":\"category\"}],\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"legendPosition\":\"right\",\"seriesParams\":[{\"data\":{\"id\":\"1\",\"label\":\"Avg Delay\"},\"drawLinesBetweenPoints\":true,\"mode\":\"normal\",\"show\":\"true\",\"showCircles\":true,\"type\":\"histogram\",\"valueAxis\":\"ValueAxis-1\"},{\"data\":{\"id\":\"3\",\"label\":\"Max Delay\"},\"drawLinesBetweenPoints\":true,\"mode\":\"normal\",\"show\":true,\"showCircles\":true,\"type\":\"histogram\",\"valueAxis\":\"ValueAxis-1\"},{\"data\":{\"id\":\"4\",\"label\":\"Min Delay\"},\"drawLinesBetweenPoints\":true,\"mode\":\"normal\",\"show\":true,\"showCircles\":true,\"type\":\"histogram\",\"valueAxis\":\"ValueAxis-1\"}],\"times\":[],\"type\":\"histogram\",\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"labels\":{\"filter\":false,\"rotate\":0,\"show\":true,\"truncate\":100},\"name\":\"LeftAxis-1\",\"position\":\"left\",\"scale\":{\"mode\":\"normal\",\"type\":\"linear\"},\"show\":true,\"style\":{},\"title\":{\"text\":\"Avg Delay\"},\"type\":\"value\"}]},\"title\":\"Meest vertraagde bussen\",\"type\":\"histogram\"}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"65a20f80-02d5-11e9-98e5-6b0645b756ca\",\"filter\":[{\"$state\":{\"store\":\"appState\"},\"exists\":{\"field\":\"punctuality\"},\"meta\":{\"alias\":null,\"disabled\":false,\"index\":\"65a20f80-02d5-11e9-98e5-6b0645b756ca\",\"key\":\"punctuality\",\"negate\":false,\"type\":\"exists\",\"value\":\"exists\"}},{\"meta\":{\"index\":\"65a20f80-02d5-11e9-98e5-6b0645b756ca\",\"negate\":true,\"disabled\":false,\"alias\":null,\"type\":\"phrase\",\"key\":\"punctuality\",\"value\":\"3,600\",\"params\":{\"query\":3600,\"type\":\"phrase\"}},\"query\":{\"match\":{\"punctuality\":{\"query\":3600,\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}}],\"query\":{\"language\":\"lucene\",\"query\":\"\"}}"
+      }
+    },
+    "_meta": {
+      "savedObjectVersion": 2
+    }
+  },
+  {
+    "_id": "029559f0-02d6-11e9-98e5-6b0645b756ca",
+    "_type": "visualization",
+    "_source": {
+      "title": "Punctualiteit",
+      "visState": "{\"title\":\"Punctualiteit\",\"type\":\"line\",\"params\":{\"addLegend\":true,\"addTimeMarker\":true,\"addTooltip\":true,\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"labels\":{\"show\":true,\"truncate\":100},\"position\":\"bottom\",\"scale\":{\"type\":\"linear\"},\"show\":true,\"style\":{},\"title\":{},\"type\":\"category\"}],\"grid\":{\"categoryLines\":true,\"style\":{\"color\":\"#eee\"},\"valueAxis\":\"ValueAxis-1\"},\"legendPosition\":\"right\",\"seriesParams\":[{\"data\":{\"id\":\"1\",\"label\":\"AVG\"},\"drawLinesBetweenPoints\":true,\"mode\":\"normal\",\"show\":\"true\",\"showCircles\":true,\"type\":\"area\",\"valueAxis\":\"ValueAxis-1\",\"interpolate\":\"cardinal\"},{\"show\":true,\"mode\":\"normal\",\"type\":\"line\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"cardinal\",\"data\":{\"id\":\"3\",\"label\":\"MIN\"},\"valueAxis\":\"ValueAxis-1\"},{\"show\":true,\"mode\":\"normal\",\"type\":\"line\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"cardinal\",\"data\":{\"id\":\"4\",\"label\":\"MAX\"},\"valueAxis\":\"ValueAxis-1\"}],\"times\":[],\"type\":\"line\",\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"labels\":{\"filter\":false,\"rotate\":0,\"show\":true,\"truncate\":100},\"name\":\"LeftAxis-1\",\"position\":\"left\",\"scale\":{\"mode\":\"normal\",\"type\":\"linear\"},\"show\":true,\"style\":{},\"title\":{\"text\":\"AVG\"},\"type\":\"value\"}]},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"punctuality\",\"customLabel\":\"AVG\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"timestamp\",\"interval\":\"m\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"min\",\"schema\":\"metric\",\"params\":{\"field\":\"punctuality\",\"customLabel\":\"MIN\"}},{\"id\":\"4\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"punctuality\",\"customLabel\":\"MAX\"}}]}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"65a20f80-02d5-11e9-98e5-6b0645b756ca\",\"filter\":[{\"meta\":{\"index\":\"65a20f80-02d5-11e9-98e5-6b0645b756ca\",\"negate\":false,\"disabled\":false,\"alias\":null,\"type\":\"exists\",\"key\":\"punctuality\",\"value\":\"exists\"},\"exists\":{\"field\":\"punctuality\"},\"$state\":{\"store\":\"appState\"}},{\"meta\":{\"index\":\"65a20f80-02d5-11e9-98e5-6b0645b756ca\",\"type\":\"phrases\",\"key\":\"punctuality\",\"value\":\"3,600, -3,600\",\"params\":[\"3600\",\"-3600\"],\"negate\":true,\"disabled\":false,\"alias\":null},\"query\":{\"bool\":{\"should\":[{\"match_phrase\":{\"punctuality\":\"3600\"}},{\"match_phrase\":{\"punctuality\":\"-3600\"}}],\"minimum_should_match\":1}},\"$state\":{\"store\":\"appState\"}}],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+      }
+    },
+    "_meta": {
+      "savedObjectVersion": 2
+    }
+  }
+]
