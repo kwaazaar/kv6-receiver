@@ -1,4 +1,8 @@
 ﻿using Kv6Receiver.bison;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.DataContracts;
+using Microsoft.ApplicationInsights.DependencyCollector;
+using Microsoft.ApplicationInsights.Extensibility;
 using NetMQ;
 using NetMQ.Sockets;
 using Newtonsoft.Json.Linq;
@@ -19,13 +23,31 @@ namespace Kv6Receiver
     {
         static XmlSerializer serializer = new XmlSerializer(typeof(VV_TM_PUSH));
         static HttpClient httpClient = new HttpClient();
+        static TelemetryClient telemetryClient = null;
+        static DependencyTrackingTelemetryModule depTrackingModule = null;
 
         static void Main(string[] args)
         {
-            httpClient.BaseAddress = new Uri(args.Length < 1 ? "http://localhost:9200/qbuzz/" : args[0]);
+            httpClient.BaseAddress = new Uri("http://localhost:9200/qbuzz/");
+            var nodeAddr = "tcp://pubsub.besteffort.ndovloket.nl:7658";
+            var subscriptions = new string[] { @"/QBUZZ/KV6posinfo" };
+            var instrumentationKey = args.Length > 0 ? args[0] : default(string);
 
-            var nodeAddr = args.Length < 2 ? "tcp://pubsub.besteffort.ndovloket.nl:7658" : args[1];
-            var subscriptions = args.Length < 3 ? new string[] { @"/QBUZZ/KV6posinfo" } : args.Skip(2).ToArray();
+            if (instrumentationKey != null)
+            {
+                TelemetryConfiguration.Active.InstrumentationKey = instrumentationKey;
+                // stamps telemetry with correlation identifiers
+                TelemetryConfiguration.Active.TelemetryInitializers.Add(new OperationCorrelationTelemetryInitializer());
+                // ensures proper DependencyTelemetry.Type is set for Azure RESTful API calls
+                TelemetryConfiguration.Active.TelemetryInitializers.Add(new HttpDependenciesParsingTelemetryInitializer());
+
+                telemetryClient = new TelemetryClient();
+
+                depTrackingModule = new DependencyTrackingTelemetryModule();
+                //module.ExcludeComponentCorrelationHttpHeadersOnDomains.Add("core.windows.net");
+                depTrackingModule.Initialize(TelemetryConfiguration.Active);
+
+            }
 
             var cancellationTokenSource = new CancellationTokenSource();
             Console.CancelKeyPress += delegate (object sender, ConsoleCancelEventArgs e)
@@ -46,10 +68,23 @@ namespace Kv6Receiver
             {
                 Console.WriteLine("Processor failed: {0}", ex);
             }
+
+            if (telemetryClient != null)
+            {
+                Console.Write("Shutting down, please wait...");
+                telemetryClient.Flush();
+                Task.Delay(2000).Wait(); // Flush is not blocking :-s
+                depTrackingModule.Dispose();
+                Console.WriteLine("Done");
+            }
         }
 
         private static Task StartProcessor(string nodeAddr, string[] subscriptions, CancellationTokenSource cancellationTokenSource)
         {
+            telemetryClient.TrackTrace($"Starting processor for {nodeAddr}", SeverityLevel.Information, new Dictionary<string, string>
+                {
+                    { nameof(nodeAddr), nodeAddr },
+                });
             return Task.Factory.StartNew(async () =>
             {
                 string index = "kv6";
@@ -67,18 +102,23 @@ namespace Kv6Receiver
                         while (!cancellationTokenSource.IsCancellationRequested)
                         {
                             var messageList = socket.ReceiveMultipartBytes(2);
-                            var msg1 = Encoding.UTF8.GetString(messageList[0]);
+                            var subscription = Encoding.UTF8.GetString(messageList[0]);
 
-                            string msg2 = null;
+                            string payload = null;
                             using (GZipStream stream = new GZipStream(new MemoryStream(messageList[1]), CompressionMode.Decompress))
                             using (var sr = new StreamReader(stream))
-                                msg2 = await sr.ReadToEndAsync();
+                                payload = await sr.ReadToEndAsync();
 
 #if DEBUG
-                            Console.Write($"{msg1} - {msg2.Length} chars...");
+                            Console.Write($"{subscription} - {payload.Length} chars...");
 #endif
 
-                            var xml = DeserializeMessage(msg2);
+                            var xml = DeserializeMessage(payload);
+                            telemetryClient.TrackTrace($"Received payload for {subscription}, size: {payload.Length} characters", SeverityLevel.Verbose, new Dictionary<string, string>
+                            {
+                                { nameof(subscription), subscription },
+                                { nameof(payload), payload },
+                            });
                             var jsonObjects = GetJsonRepresentation(xml.Timestamp, xml.KV6posinfo);
                             await StoreJsonObjects(index, jsonObjects);
                         }
@@ -87,6 +127,7 @@ namespace Kv6Receiver
                     {
                         socket.Disconnect(nodeAddr);
                         socket.Close();
+                        telemetryClient.TrackTrace("Stopped processor", SeverityLevel.Information);
                     }
                 }
 
@@ -100,9 +141,22 @@ namespace Kv6Receiver
                 // Guid as ID
                 var relativeUri = $"{index}/{Guid.NewGuid()}";
                 var stringContent = jObj.ToString();
-                var res = await httpClient.PostAsync(relativeUri, new StringContent(stringContent, Encoding.UTF8, "application/json"));
-                if (!res.IsSuccessStatusCode)
+
+                try
                 {
+                    var res = await httpClient.PostAsync(relativeUri, new StringContent(stringContent, Encoding.UTF8, "application/json"));
+                    if (!res.IsSuccessStatusCode)
+                    {
+                        telemetryClient.TrackTrace($"Failed to store json objects, http-status: {res.StatusCode}", SeverityLevel.Error, new Dictionary<string, string>
+                            {
+                                { "httpstatus", res.StatusCode.ToString() },
+                            });
+                        Console.WriteLine("Write failure!");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    telemetryClient.TrackException(ex);
                     Console.WriteLine("Write failure!");
                 }
             });
